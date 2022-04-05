@@ -1,13 +1,14 @@
-FROM golang:1.18-alpine as build
+FROM golang:1.18-alpine AS build
 
 WORKDIR /usr/src/app
 
-COPY go.mod go.sum ./
-RUN go mod download && go mod verify
+COPY . .
+RUN go build main.go
 
-FROM golang:1.18-alpine
+FROM scratch
 
-COPY --from=build . .
-RUN go build -v -o /usr/local/bin/app ./...
+WORKDIR /usr/src/app
 
-CMD ["app"]
+COPY --from=build /usr/src/app /usr/src/app
+
+CMD ["./main"]
